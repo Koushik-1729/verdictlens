@@ -2,7 +2,7 @@
 
 Your agent failed. You don't know which one.
 
-That's the problem I kept running into — multi-agent pipelines where something breaks in step 2, causes a silent bad state, and the whole thing blows up in step 7. Every existing tool just shows you a flat list of spans. None of them tell you *who started it*.
+That's the problem I kept running into - multi-agent pipelines where something breaks in step 2, causes a silent bad state, and the whole thing blows up in step 7. Every existing tool just shows you a flat list of spans. None of them tell you *who started it*.
 
 VerdictLens does. It traverses the span tree, classifies every agent as ORIGINATOR / PROPAGATOR / MANIFESTOR / CLEAN, and gives you a single sentence explaining what broke and why.
 
