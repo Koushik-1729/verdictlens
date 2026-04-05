@@ -202,6 +202,10 @@ class FakeStore:
 _store = FakeStore()
 
 
+async def _fake_health() -> dict:
+    return {"status": "ok", "clickhouse": "connected", "redis": "connected"}
+
+
 @pytest.fixture(autouse=True)
 def _patch_clickhouse(monkeypatch: pytest.MonkeyPatch) -> None:
     """
@@ -223,6 +227,7 @@ def _patch_clickhouse(monkeypatch: pytest.MonkeyPatch) -> None:
 
     monkeypatch.setattr(ch_mod, "ensure_schema", lambda *a, **kw: None)
     monkeypatch.setattr(ch_mod, "close_client", lambda: None)
+    monkeypatch.setattr(routes_mod, "health", _fake_health)
 
 
 @pytest_asyncio.fixture
