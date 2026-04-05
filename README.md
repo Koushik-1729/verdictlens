@@ -387,7 +387,6 @@ Not trying to replace everything — just filling the gap that none of them cove
 | Evaluation engine | Yes | Yes | Yes | No |
 | Prompt playground | Yes | Yes | No | No |
 | Multi-workspace | Yes | Yes | Yes | No |
-| Trace overhead | <2ms | Unknown | ~5ms | ~10ms |
 | Cost | Free, self-hosted | $39+/seat/mo | Free tier + paid | $20+/mo |
 
 ---
