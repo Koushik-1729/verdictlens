@@ -114,7 +114,7 @@ class FakeStore:
             ))
         return TraceListResponse(traces=out, total=len(out), page=page, page_size=page_size)
 
-    def get_trace(self, trace_id: str, settings: Any = None) -> Optional[TraceDetailOut]:
+    def get_trace(self, trace_id: str, settings: Any = None, **kwargs: Any) -> Optional[TraceDetailOut]:
         """
         Fetch a trace and its spans by id.
 
