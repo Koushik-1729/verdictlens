@@ -78,7 +78,7 @@ async def test_health(client: AsyncClient) -> None:
     """
     resp = await client.get("/health")
     assert resp.status_code == 200
-    assert resp.json()["status"] in ("ok", "degraded")
+    assert resp.json()["status"] == "ok"
 
 
 # ---------------------------------------------------------------------------
