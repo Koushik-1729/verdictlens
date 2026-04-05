@@ -9,7 +9,7 @@ description = "Open-source observability for AI agents — hierarchical tracing,
 readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "Apache-2.0"}
-authors = [{ name = "VerdictLens" }]
+authors = [{ name = "Yeruva Koushik Reddy", email = "koushik.yeruva02@gmail.com" }]
 keywords = ["ai", "agents", "observability", "tracing", "llm", "openai", "langchain", "debugging"]
 classifiers = [
   "Development Status :: 3 - Alpha",
@@ -57,10 +57,10 @@ all = [
 verdictlens-ci = "verdictlens.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/verdictlens/verdictlens"
-Documentation = "https://github.com/verdictlens/verdictlens#readme"
-Repository = "https://github.com/verdictlens/verdictlens"
-"Bug Tracker" = "https://github.com/verdictlens/verdictlens/issues"
+Homepage = "https://github.com/Koushik-1729/verdictlens"
+Documentation = "https://github.com/Koushik-1729/verdictlens#readme"
+Repository = "https://github.com/Koushik-1729/verdictlens"
+"Bug Tracker" = "https://github.com/Koushik-1729/verdictlens/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["verdictlens"]
