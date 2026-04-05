@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+.pytest_cache/
+*.egg
+*.whl
+*.tar.gz
+htmlcov/
+.coverage
+
+# Node
+node_modules/
+frontend/dist/
+
+# Environment — NEVER commit real keys
+.env
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# OS
+*.bak
+*.tmp
+
+# Docker volumes (local data)
+data/
+
+# Test artifacts
+sdk/tmp_test_queues/
+
+# Benchmarks output
+benchmarks/*.json
+
+# Test run artifacts
+results.json
+
+# Claude Code local settings
+.claude/

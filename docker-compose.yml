@@ -1,0 +1,145 @@
+# =============================================================================
+# VerdictLens — Single-command self-hosted deployment
+#
+#   docker compose up -d
+#
+# Services:
+#   verdictlens-api   — FastAPI backend  (port 8000)
+#   verdictlens-ui    — React dashboard  (port 3000 via nginx)
+#   postgres        — Transactional DB (workspaces, auth, prompts, alerts)
+#   clickhouse      — Trace storage    (analytical — traces, spans, metrics)
+#   redis           — WebSocket pub/sub (port 6379)
+# =============================================================================
+
+services:
+  # ---------- PostgreSQL ----------
+  # Bundled by default so `docker compose up -d` works with zero config.
+  # To use an external PostgreSQL, set VERDICTLENS_DATABASE_URL in .env and
+  # remove (or comment out) this service.
+  postgres:
+    image: postgres:16-alpine
+    container_name: verdictlens-postgres
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-verdictlens}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  # ---------- ClickHouse ----------
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.3-alpine
+    container_name: verdictlens-clickhouse
+    # Ports intentionally NOT published — ClickHouse should only be
+    # reachable inside the Docker network.  Uncomment for local debugging only:
+    # ports:
+    #   - "${CLICKHOUSE_HTTP_PORT:-8123}:8123"
+    #   - "${CLICKHOUSE_NATIVE_PORT:-9000}:9000"
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+      - clickhouse_logs:/var/log/clickhouse-server
+      - ./deploy/clickhouse/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh:ro
+    environment:
+      CLICKHOUSE_DB: verdictlens
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  # ---------- Redis ----------
+  redis:
+    image: redis:7-alpine
+    container_name: verdictlens-redis
+    # Ports intentionally NOT published — Redis should only be
+    # reachable inside the Docker network.  Uncomment for local debugging only:
+    # ports:
+    #   - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --save 60 1 --loglevel warning
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  # ---------- API Server ----------
+  verdictlens-api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: verdictlens-api
+    ports:
+      - "${API_PORT:-8000}:8000"
+    env_file:
+      - .env
+    environment:
+      # Points to the bundled PostgreSQL container by default.
+      # Override with VERDICTLENS_DATABASE_URL in .env to use an external PG.
+      VERDICTLENS_DATABASE_URL: ${VERDICTLENS_DATABASE_URL:-postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-agentlens}}
+      VERDICTLENS_CH_HOST: clickhouse
+      VERDICTLENS_CH_PORT: 8123
+      VERDICTLENS_REDIS_URL: redis://redis:6379/0
+      # Uncomment to enable API key auth (open mode by default):
+      # VERDICTLENS_API_KEY: your-secret-key-here
+      # LLM keys for Replay (real re-execution of agent calls)
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      XAI_API_KEY: ${XAI_API_KEY:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  # ---------- Frontend ----------
+  verdictlens-ui:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: verdictlens-ui
+    ports:
+      - "${UI_PORT:-3000}:80"
+    depends_on:
+      verdictlens-api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:80/"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  clickhouse_data:
+    driver: local
+  clickhouse_logs:
+    driver: local
+  redis_data:
+    driver: local

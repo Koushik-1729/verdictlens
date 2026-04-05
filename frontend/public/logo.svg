@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <!-- Background rounded square -->
+  <rect width="120" height="120" rx="24" fill="#0E1E3E"/>
+
+  <!-- Connection lines -->
+  <line x1="42" y1="60" x2="70" y2="44" stroke="#5B8DD9" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="42" y1="60" x2="70" y2="76" stroke="#5B8DD9" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Left node -->
+  <circle cx="38" cy="60" r="7" fill="#5B8DD9"/>
+
+  <!-- Top-right node -->
+  <circle cx="74" cy="42" r="7" fill="#5B8DD9"/>
+
+  <!-- Bottom-right node -->
+  <circle cx="74" cy="78" r="7" fill="#5B8DD9"/>
+
+  <!-- Center accent node (orange, blame indicator) -->
+  <circle cx="57" cy="60" r="11" fill="#E8603A"/>
+  <!-- Lightning bolt / crack symbol -->
+  <polyline points="60,52 54,61 59,61 56,68" stroke="#0E1E3E" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" fill="none"/>
+</svg>

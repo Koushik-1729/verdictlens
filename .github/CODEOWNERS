@@ -1,0 +1,15 @@
+# Default owners for everything
+* @agentlens/maintainers
+
+# SDK
+/sdk/ @agentlens/maintainers
+
+# Backend
+/backend/ @agentlens/maintainers
+
+# Frontend
+/frontend/ @agentlens/maintainers
+
+# CI/CD and repo config
+/.github/ @agentlens/maintainers
+/docker-compose.yml @agentlens/maintainers

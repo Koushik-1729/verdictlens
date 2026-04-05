@@ -1,0 +1,45 @@
+[build-system]
+requires = ["hatchling>=1.21.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "verdictlens-backend"
+version = "0.1.0"
+description = "VerdictLens API server — trace ingestion, query, and real-time streaming."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+authors = [{ name = "VerdictLens" }]
+dependencies = [
+  "fastapi>=0.115.0",
+  "uvicorn[standard]>=0.30.0",
+  "clickhouse-connect>=0.7.0",
+  "redis>=5.0.0",
+  "pydantic>=2.5.0",
+  "pydantic-settings>=2.2.0",
+  "bcrypt>=4.0.0",
+  "httpx>=0.27.0",
+  "openai>=1.0.0",
+  "sqlalchemy>=2.0.0",
+  "psycopg2-binary>=2.9.0",
+  "alembic>=1.13.0",
+  "python-multipart>=0.0.9",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0.0",
+  "pytest-asyncio>=0.23.0",
+  "httpx>=0.27.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
