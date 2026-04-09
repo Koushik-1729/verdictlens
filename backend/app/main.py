@@ -20,6 +20,8 @@ from typing import AsyncIterator
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import Request
+import time
 
 from app import __version__
 from app.alerts import alert_evaluation_loop, close_alerts_db
@@ -119,3 +121,12 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = (time.time() - start_time) * 1000
+    logger.info(
+        f"{request.method} {request.url.path} {response.status_code} - {process_time:.2f}ms"
+    )
+    return response
