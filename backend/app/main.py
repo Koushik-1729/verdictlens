@@ -32,6 +32,20 @@ from app.settings import get_settings
 
 logger = logging.getLogger("verdictlens")
 
+class LoggingMiddleware:
+    """
+    Middleware to log incoming HTTP requests with method, path, status code, and response time.
+    """
+    async def __call__(self, request, call_next):
+        import time
+        start_time = time.time()
+        response = await call_next(request)
+        process_time = (time.time() - start_time) * 1000  # convert to milliseconds
+        logger.info(
+            f"{request.method} {request.url.path} {response.status_code} {process_time:.2f}ms"
+        )
+        return response
+
 
 @asynccontextmanager
 async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
