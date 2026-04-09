@@ -1,7 +1,23 @@
 """
 FastAPI application factory for the VerdictLens backend.
 
-``create_app()`` wires together:
+``create_app()
+import time
+from fastapi import Request
+
+async def request_logging_middleware(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = (time.time() - start_time) * 1000
+    logging.info(
+        f"method={request.method} path={request.url.path} status_code={response.status_code} "
+        f"response_time={process_time:.2f}ms"
+    )
+    return response
+
+app.add_middleware(
+    request_logging_middleware
+)`` wires together:
 - PostgreSQL schema bootstrap (workspaces, API keys, prompts, alerts)
 - ClickHouse schema bootstrap (traces, spans, metrics)
 - Redis-backed WebSocket pub/sub
