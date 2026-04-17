@@ -12,7 +12,6 @@
 
 **Do not open a public GitHub issue for security vulnerabilities.**
 
-Email **[security@verdictlens.dev](mailto:security@verdictlens.dev)** with:
 
 1. Description of the vulnerability
 2. Steps to reproduce
