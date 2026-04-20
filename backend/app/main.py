@@ -18,7 +18,7 @@ import logging
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from app import __version__
@@ -29,8 +29,20 @@ from app.database import close_db, init_db
 from app.live import manager
 from app.routes import router
 from app.settings import get_settings
+import time
 
 logger = logging.getLogger("verdictlens")
+
+
+async def log_requests(request: Request, call_next):
+    """Log incoming HTTP requests with method, path, status code, and response time."""
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = (time.time() - start_time) * 1000
+    logger.info(
+        f"{request.method} {request.url.path} {response.status_code} {process_time:.2f}ms"
+    )
+    return response
 
 
 @asynccontextmanager
@@ -112,6 +124,8 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    app.middleware('http')(log_requests)
 
     app.include_router(router)
 
