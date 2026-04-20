@@ -32,6 +32,45 @@ from app.settings import get_settings
 
 logger = logging.getLogger("verdictlens")
 
+class RequestLoggingMiddleware:
+    """
+    Middleware to log incoming HTTP requests with method, path, status code, and response time.
+    """
+    
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+
+        import time
+        start_time = time.time()
+        
+        # Extract request info
+        method = scope.get("method", "UNKNOWN")
+        path = scope.get("path", "UNKNOWN")
+        
+        # Wrapper to capture status code
+        status_code = [200]  # Default to 200, will be updated if we get a response
+        
+        async def send_wrapper(message):
+            if message["type"] == "http.response.start":
+                status_code[0] = message.get("status", 200)
+            await send(message)
+        
+        # Process the request
+        await self.app(scope, receive, send_wrapper)
+        
+        # Calculate response time
+        process_time = (time.time() - start_time) * 1000  # Convert to milliseconds
+        
+        # Log the request
+        logger.info(
+            f"{method} {path} {status_code[0]} {process_time:.2f}ms"
+        )
+
 
 @asynccontextmanager
 async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -112,6 +151,7 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    app.add_middleware(RequestLoggingMiddleware)
 
     app.include_router(router)
 
